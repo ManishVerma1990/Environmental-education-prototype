@@ -1,0 +1,70 @@
+<% layout('layout') -%>
+<h3>Badge Rules</h3>
+
+<div class="row g-4">
+  <!-- Create Badge -->
+  <div class="col-md-5">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5>Create Badge</h5>
+        <form action="/badges/rules/create" method="post">
+          <div class="mb-2">
+            <label class="form-label">Name</label>
+            <input name="name" class="form-control" required />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Icon URL</label>
+            <input name="icon_url" type="url" class="form-control" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Criteria</label>
+            <!-- Keep example simple to avoid parser confusion -->
+            <input name="criteria" class="form-control" placeholder="e.g., quiz_avg>=80 AND tasks_verified>=5" />
+          </div>
+          <button class="btn btn-success">Create</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Existing Badges -->
+  <div class="col-md-7">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5>Existing Badges</h5>
+
+        <ul class="list-group mb-3">
+          <% if (badges && badges.length) { %>
+            <% for (var i = 0; i < badges.length; i++) { var b = badges[i]; %>
+              <li class="list-group-item d-flex align-items-center justify-content-between">
+                <div>
+                  <% if (b.icon_url) { %>
+                    <img src="<%= b.icon_url %>" style="width:28px;height:28px" class="me-2" />
+                  <% } %>
+                  <strong><%= b.name %></strong>
+                  <small class="text-muted ms-2"><%= b.criteria %></small>
+                </div>
+                <!-- (Optional) Teacher assign button; remove or wire as needed -->
+                <!--
+                <form action="/badges/assign/<%= user ? user.id : 1 %>/<%= b.id %>" method="post">
+                  <button class="btn btn-sm btn-outline-secondary" type="submit">Assign</button>
+                </form>
+                -->
+              </li>
+            <% } %>
+          <% } else { %>
+            <li class="list-group-item">No badges yet.</li>
+          <% } %>
+        </ul>
+
+        <div class="alert alert-info mb-0">
+          You can evaluate/assign via routes or add buttons here later.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

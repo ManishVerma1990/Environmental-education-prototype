@@ -1,0 +1,24 @@
+<% layout('layout') -%>
+
+<div class="p-4 rounded-3 mb-4 text-white"
+     style="background: linear-gradient(135deg, #198754 0%, #2bb673 100%);">
+  <h2 class="mb-1"><%= game.title %></h2>
+  <p class="mb-0"><%= game.description %></p>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <p class="mb-3">
+      This game opens in a separate tab/window for best performance and compatibility.
+    </p>
+    <a href="<%= game.url %>" target="_blank" rel="noopener"
+       class="btn btn-primary btn-lg">
+      Open Game
+    </a>
+    <a href="/games" class="btn btn-outline-secondary btn-lg ms-2">Back to Games</a>
+
+    <div class="alert alert-info mt-4 mb-0">
+      If the game didn’t open, check your browser’s pop-up blocker or click the button again.
+    </div>
+  </div>
+</div>

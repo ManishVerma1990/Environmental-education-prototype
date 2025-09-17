@@ -1,0 +1,20 @@
+<% layout('layout') -%>
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h3>Real‑World Tasks</h3>
+</div>
+<div class="row g-3">
+<% tasks.forEach(t=>{ %>
+<div class="col-md-6">
+<div class="card h-100">
+<div class="card-body">
+<h5><%= t.title %></h5>
+<p class="text-muted"><%= t.description %></p>
+<span class="badge bg-success">+<%= t.points %> pts</span>
+<div class="mt-2">
+<a class="btn btn-outline-success btn-sm" href="/tasks/<%= t.id %>/submit">Submit Proof</a>
+</div>
+</div>
+</div>
+</div>
+<% }) %>
+</div>

@@ -1,0 +1,24 @@
+<% layout('layout') -%>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Games</h3>
+  <% if (user.role === 'teacher' || user.role === 'admin') { %>
+    <a class="btn btn-success" href="/games/create/new">Add Game</a>
+  <% } %>
+</div>
+
+<div class="row g-3">
+  <% games.forEach(g=>{ %>
+    <div class="col-md-6">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="mb-1"><%= g.title %></h5>
+          <p class="text-muted"><%= g.description %></p>
+          <div class="d-flex gap-2">
+            <a href="/games/<%= g.id %>" class="btn btn-primary btn-sm">Open</a>
+            <a href="<%= g.url %>" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">Open in new tab</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+</div>

@@ -1,0 +1,123 @@
+<% layout('layout') -%>
+<h3>Create Lesson</h3>
+
+<form action="/lessons/create" method="post">
+  <!-- Basic info -->
+  <div class="mb-3">
+    <label class="form-label">Title</label>
+    <input name="title" class="form-control" required />
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Description</label>
+    <textarea name="description" class="form-control" rows="3"></textarea>
+  </div>
+
+  <hr/>
+  <!-- Resources -->
+  <h5>Resources</h5>
+  <p class="text-muted">Add videos, PDFs, or image sets. (No JSON)</p>
+
+  <div id="resList" class="vstack gap-3"></div>
+  <button type="button" class="btn btn-outline-success" onclick="addRes()">+ Add Resource</button>
+
+  <hr class="mt-4"/>
+  <!-- Checkpoints -->
+  <h5>Checkpoints (optional)</h5>
+  <p class="text-muted">Students must pass the quiz to proceed beyond the specified resource index.</p>
+
+  <div id="cpList" class="vstack gap-2"></div>
+  <button type="button" class="btn btn-outline-secondary" onclick="addCp()">+ Add Checkpoint</button>
+
+  <div class="mt-4">
+    <button class="btn btn-success">Save Lesson</button>
+  </div>
+</form>
+
+<script>
+(function(){
+  const resList = document.getElementById('resList');
+  const cpList  = document.getElementById('cpList');
+
+  // Add a resource row
+  window.addRes = function(){
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="card-body">
+        <div class="row g-2 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label">Type</label>
+            <select class="form-select res-type" name="res_type[]">
+              <option value="video">Video (embed URL)</option>
+              <option value="pdf">PDF (public URL)</option>
+              <option value="imageSet">Image Set</option>
+            </select>
+          </div>
+
+          <div class="col-md-7 res-url-block">
+            <label class="form-label">URL</label>
+            <input class="form-control" name="res_url[]" placeholder="https://..." />
+          </div>
+
+          <div class="col-md-7 res-images-block d-none">
+            <label class="form-label">Image URLs (comma or newline separated)</label>
+            <textarea class="form-control" name="res_images[]" rows="2" placeholder="https://img1, https://img2"></textarea>
+          </div>
+
+          <div class="col-md-2 text-end">
+            <button type="button" class="btn btn-outline-danger" onclick="this.closest('.card').remove()">Remove</button>
+          </div>
+        </div>
+      </div>
+    `;
+    resList.appendChild(card);
+    hookResourceRow(card);
+  };
+
+  // Toggle URL vs Image list based on type
+  function hookResourceRow(card){
+    const typeSel = card.querySelector('.res-type');
+    const urlBlk  = card.querySelector('.res-url-block');
+    const imgBlk  = card.querySelector('.res-images-block');
+
+    function toggle(){
+      const v = typeSel.value;
+      if (v === 'imageSet'){
+        imgBlk.classList.remove('d-none');
+        urlBlk.classList.add('d-none');
+      } else {
+        imgBlk.classList.add('d-none');
+        urlBlk.classList.remove('d-none');
+      }
+      // NOTE: we do NOT disable inputs so arrays stay aligned on submit.
+      // Unused fields will submit as empty strings which is fine.
+    }
+    typeSel.addEventListener('change', toggle);
+    toggle();
+  }
+
+  // Add a checkpoint row
+  window.addCp = function(){
+    const row = document.createElement('div');
+    row.className = 'row g-2';
+    row.innerHTML = `
+      <div class="col-md-4">
+        <label class="form-label">Quiz ID</label>
+        <input type="number" min="1" name="cp_quizId[]" class="form-control" placeholder="e.g., 3" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">After Resource Index</label>
+        <input type="number" min="0" name="cp_afterIndex[]" class="form-control" placeholder="0 for after first resource" />
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button type="button" class="btn btn-outline-danger w-100" onclick="this.closest('.row').remove()">Remove</button>
+      </div>
+    `;
+    cpList.appendChild(row);
+  };
+
+  // Start with one resource row by default
+  addRes();
+})();
+</script>

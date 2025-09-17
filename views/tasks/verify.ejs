@@ -1,0 +1,20 @@
+<% layout('layout') -%>
+<h3>Verify Submissions</h3>
+<table class="table table-striped align-middle">
+<thead><tr><th>Student</th><th>Preview</th><th>Description</th><th>Points</th><th>Action</th></tr></thead>
+<tbody>
+<% subs.forEach(s=>{ %>
+<tr>
+<td><%= s.student %></td>
+<td><img src="<%= s.image_url %>" style="max-width:120px" class="img-thumbnail"/></td>
+<td><%= s.description %></td>
+<td><%= s.points %></td>
+<td>
+<form action="/tasks/<%= s.id %>/verify" method="post">
+<button class="btn btn-success btn-sm">Verify</button>
+</form>
+</td>
+</tr>
+<% }) %>
+</tbody>
+</table>

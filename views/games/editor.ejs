@@ -1,0 +1,20 @@
+<% layout('layout') -%>
+<h3>Add Game (opens on its own page)</h3>
+<form action="/games/create" method="post">
+  <div class="mb-3">
+    <label class="form-label">Title</label>
+    <input name="title" class="form-control" required />
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Description</label>
+    <textarea name="description" class="form-control" rows="3"></textarea>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Game URL</label>
+    <input name="url" type="url" class="form-control" placeholder="https://..." required />
+    <div class="form-text">
+      The game will open in a new tab. Use HTTPS links. Sites that block embedding (e.g., plays.org) work fine this way.
+    </div>
+  </div>
+  <button class="btn btn-success">Save</button>
+</form>

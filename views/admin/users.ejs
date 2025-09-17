@@ -1,0 +1,29 @@
+<% layout('layout') -%>
+<h3>User Management</h3>
+<table class="table table-striped">
+<thead><tr><th>Name</th><th>Email</th><th>Role</th><th>EcoPoints</th><th>Action</th></tr></thead>
+<tbody>
+<% users.forEach(u=>{ %>
+<tr>
+<td><%= u.name %></td>
+<td><%= u.email %></td>
+<td>
+<form action="/admin/users/<%= u.id %>/role" method="post" class="d-flex gap-2 align-items-center">
+<select name="role" class="form-select form-select-sm" style="width:140px">
+<option value="student" <%= u.role==='student'?'selected':'' %>>student</option>
+<option value="teacher" <%= u.role==='teacher'?'selected':'' %>>teacher</option>
+<option value="admin" <%= u.role==='admin'?'selected':'' %>>admin</option>
+</select>
+<button class="btn btn-sm btn-outline-primary">Update</button>
+</form>
+</td>
+<td><%= u.score %></td>
+<td>
+<form action="/admin/users/<%= u.id %>/delete?_method=POST" method="post" onsubmit="return confirm('Delete user?')">
+<button class="btn btn-sm btn-outline-danger">Delete</button>
+</form>
+</td>
+</tr>
+<% }) %>
+</tbody>
+</table>
