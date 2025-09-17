@@ -16,6 +16,8 @@ sql.split(';').map(s=>s.trim()).filter(Boolean).forEach(stmt=>{ try{ db.prepare(
 
 
 const app = express();
+const isProd = process.env.NODE_ENV === 'production';
+
 app.engine('ejs', engine); 
 app.set('view engine','ejs');
 app.use(express.urlencoded({extended:true}));
@@ -24,7 +26,20 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname,'public')));
 
 
-app.use(session({ secret: process.env.SESSION_SECRET, resave:false, saveUninitialized:false }));
+app.use(session({
+  name: 'ecolearn.sid',
+  secret: process.env.SESSION_SECRET || 'devsecret',
+  resave: false,
+  saveUninitialized: false,
+  // rolling: refresh cookie expiry on each response for sliding session
+  rolling: true,
+  cookie: {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: isProd,             // true only when behind HTTPS
+    maxAge: 30*24*60*60*1000    // 30 days default persistence
+  }
+}));
 app.use(flash());
 require('./config/passport')(passport);
 app.use(passport.initialize());
@@ -43,8 +58,14 @@ app.use('/games', require('./routes/games'));
 app.use('/admin', require('./routes/admin'));
 app.use('/badges', require('./routes/badges'));
 
+// server.js
+app.get('/', (req, res) => {
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    return res.redirect('/dashboard');
+  }
+  res.render('home', { next: req.query.next || '' }); // <— new landing page view below
+});
 
-app.get('/', (req,res)=> res.redirect('/dashboard'));
 
 
 const PORT = process.env.PORT || 3000;

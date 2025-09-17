@@ -34,7 +34,12 @@ res.redirect(`/lessons/${id}`);
 
 
 // CRUD (teacher/admin)
-router.get('/create/new', role('teacher','admin'), (req,res)=> res.render('lessons/editor',{lesson:null}));
+// BEFORE: router.get('/create/new', role('teacher','admin'), (req,res)=> res.render('lessons/editor',{lesson:null}));
+router.get('/create/new', role('teacher','admin'), (req,res)=>{
+  const quizzes = db.prepare('SELECT id, title FROM quizzes ORDER BY id DESC').all();
+  res.render('lessons/editor', { lesson: null, quizzes }); // pass quizzes to the view
+});
+
 // router.post('/create', role('teacher','admin'), (req,res)=>{
 //     console.log(req.body);
 // const { title, description, resources, checkpoints } = req.body;
@@ -104,6 +109,76 @@ router.post('/create', role('teacher','admin'), (req, res) => {
       checkpoints.push({ quizId: q, afterResourceIndex: idx });
     }
   }
+
+// EDIT form
+router.get('/:id/edit', role('teacher','admin'), (req,res)=>{
+  const lesson = db.prepare('SELECT * FROM lessons WHERE id=?').get(req.params.id);
+  if (!lesson) return res.status(404).send('Lesson not found');
+  const quizzes = db.prepare('SELECT id,title FROM quizzes ORDER BY id DESC').all();
+  const resources = JSON.parse(lesson.resources || '[]');
+  const checkpoints = JSON.parse(lesson.checkpoints || '[]');
+  res.render('lessons/editor', { lesson, quizzes, resources, checkpoints });
+});
+
+// UPDATE
+router.put('/:id', role('teacher','admin'), (req,res)=>{
+  const { title, description } = req.body;
+
+  const toArr = v => (v == null ? [] : (Array.isArray(v) ? v : [v]));
+  const types = toArr(req.body.res_type);
+  const urls  = toArr(req.body.res_url);
+  const imgs  = toArr(req.body.res_images);
+
+  const toEmbed = (t, raw) => {
+    if (!raw) return '';
+    const url = String(raw).trim();
+    const mShort = url.match(/^https?:\/\/youtu\.be\/([^?&#]+)/i);
+    if (t==='video' && mShort) return `https://www.youtube.com/embed/${mShort[1]}`;
+    const mWatch = url.match(/[?&]v=([^&#]+)/i);
+    if (t==='video' && url.includes('youtube.com') && mWatch) return `https://www.youtube.com/embed/${mWatch[1]}`;
+    const mVimeo = url.match(/^https?:\/\/vimeo\.com\/(\d+)/i);
+    if (t==='video' && mVimeo) return `https://player.vimeo.com/video/${mVimeo[1]}`;
+    const mDrive = url.match(/\/file\/d\/([^/]+)/);
+    if (t==='pdf' && mDrive) return `https://drive.google.com/file/d/${mDrive[1]}/preview`;
+    return url;
+  };
+
+  let u=0, im=0;
+  const resources = [];
+  for (const t of types) {
+    if (t === 'imageSet') {
+      const rawList = imgs[im++] || '';
+      const list = String(rawList).split(/\n|,/).map(s=>s.trim()).filter(Boolean);
+      if (list.length) resources.push({ type:'imageSet', images:list });
+    } else {
+      const rawUrl = urls[u++] || '';
+      const fixed = toEmbed(t, rawUrl);
+      if (fixed) resources.push({ type:t, url:fixed });
+    }
+  }
+
+  const cpQ = toArr(req.body.cp_quizId);
+  const cpI = toArr(req.body.cp_afterIndex);
+  const checkpoints = [];
+  for (let i=0;i<cpQ.length;i++){
+    const q = Number(cpQ[i]), idx = Number(cpI[i]);
+    if (!Number.isNaN(q) && !Number.isNaN(idx)) checkpoints.push({ quizId:q, afterResourceIndex:idx });
+  }
+
+  db.prepare('UPDATE lessons SET title=?, description=?, resources=?, checkpoints=? WHERE id=?')
+    .run(title, description, JSON.stringify(resources), JSON.stringify(checkpoints), req.params.id);
+
+  req.flash('success','Lesson updated.');
+  res.redirect('/lessons');
+});
+
+// DELETE
+router.delete('/:id', role('teacher','admin'), (req,res)=>{
+  db.prepare('DELETE FROM lessons WHERE id=?').run(req.params.id);
+  req.flash('success','Lesson deleted.');
+  res.redirect('/lessons');
+});
+
 
   // save
   db.prepare('INSERT INTO lessons(title,description,resources,checkpoints) VALUES (?,?,?,?)')

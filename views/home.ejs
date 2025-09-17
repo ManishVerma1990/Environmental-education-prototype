@@ -1,0 +1,118 @@
+<% layout('layout') -%>
+
+<section class="py-5 text-center bg-success text-white rounded-3 shadow-sm"
+         style="background: linear-gradient(135deg, #198754 0%, #2bb673 100%);">
+  <div class="container py-4">
+    <h1 class="display-5 fw-bold">EcoLearn</h1>
+    <p class="lead mb-4">Gamified environmental learning with lessons, quizzes, real-world tasks, and EcoPoints.</p>
+    <div class="d-flex justify-content-center gap-2">
+      <a class="btn btn-light btn-lg" href="/register">Get Started</a>
+      <a class="btn btn-outline-light btn-lg"
+   href="/login<%= next ? ('?next=' + encodeURIComponent(next)) : '' %>">Login</a>
+    </div>
+  </div>
+</section>
+
+<section id="features" class="container py-5">
+  <h2 class="mb-4 text-center">Features</h2>
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-3">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Interactive Lessons</h5>
+          <p class="card-text">Videos, PDFs via pdf.js (zoom/search/pagination), and image sets.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Quizzes & Checkpoints</h5>
+          <p class="card-text">Pass embedded quizzes to progress; take standalone quizzes anytime.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Real-World Tasks</h5>
+          <p class="card-text">Submit photo proof; teachers verify and award custom EcoPoints.</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">Games & Badges</h5>
+          <p class="card-text">Play iframe games; climb leaderboards and unlock badges.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="bg-light py-5">
+  <div class="container">
+    <h2 class="mb-4 text-center">How it works</h2>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body text-center">
+            <div class="display-6 mb-2">1</div>
+            <h5>Sign up</h5>
+            <p>Create a student or teacher account in seconds.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body text-center">
+            <div class="display-6 mb-2">2</div>
+            <h5>Learn & Do</h5>
+            <p>Complete lessons, pass quizzes, and finish real-world tasks.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body text-center">
+            <div class="display-6 mb-2">3</div>
+            <h5>Earn & Grow</h5>
+            <p>Collect EcoPoints, unlock badges, and top the leaderboard.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container py-5">
+  <div class="p-5 bg-success text-white rounded-3 text-center shadow-sm"
+       style="background: linear-gradient(135deg, #198754 0%, #2bb673 100%);">
+    <h2 class="mb-3">Ready to get started?</h2>
+    <p class="mb-4">Join EcoLearn today and make sustainability fun.</p>
+    <a class="btn btn-light btn-lg" href="/register">Create your account</a>
+  </div>
+</section>
+
+<section id="faq" class="container py-5">
+  <h2 class="mb-4 text-center">FAQ</h2>
+  <div class="accordion" id="faqAcc">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="q1">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#a1">Can I upload my own PDFs?</button>
+      </h2>
+      <div id="a1" class="accordion-collapse collapse show" data-bs-parent="#faqAcc">
+        <div class="accordion-body">Yes—use public URLs (e.g., Cloudinary raw URLs). They open in-app via pdf.js.</div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="q2">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#a2">Do students need an invite?</button>
+      </h2>
+      <div id="a2" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+        <div class="accordion-body">No—anyone can sign up as student, teacher, or admin (you control roles).</div>
+      </div>
+    </div>
+  </div>
+</section>

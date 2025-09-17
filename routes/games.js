@@ -1,22 +1,31 @@
+// routes/games.js
 const router = require('express').Router();
 const auth = require('../middleware/authGuard');
 const role = require('../middleware/roleGuard');
 const db = require('../config/db');
 
-
+// list (unchanged)
 router.get('/', auth, (req,res)=>{
-const games = db.prepare('SELECT id, title, description, url FROM games').all();
-res.render('games/list',{ games });
+  const games = db.prepare('SELECT * FROM games ORDER BY id DESC').all();
+  res.render('games/list', { games });
 });
 
-
-router.get('/create/new', role('teacher','admin'), (req,res)=> res.render('games/editor'));
+// create (unchanged)
+router.get('/create/new', role('teacher','admin'), (req,res)=>{
+  res.render('games/editor');
+});
 router.post('/create', role('teacher','admin'), (req,res)=>{
-const { title, description, url } = req.body;
-db.prepare('CREATE TABLE IF NOT EXISTS games (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, description TEXT, url TEXT)').run();
-db.prepare('INSERT INTO games(title,description,url) VALUES(?,?,?)').run(title,description,url);
-res.redirect('/games');
+  const { title, description, url } = req.body;
+  db.prepare('INSERT INTO games(title, description, url) VALUES(?,?,?)').run(title, description, url);
+  req.flash('success','Game added');
+  res.redirect('/games');
 });
 
+// NEW: show game details page (no iframe)
+router.get('/:id', auth, (req,res)=>{
+  const game = db.prepare('SELECT * FROM games WHERE id=?').get(req.params.id);
+  if (!game) return res.status(404).send('Game not found');
+  res.render('games/show', { game });
+});
 
 module.exports = router;
