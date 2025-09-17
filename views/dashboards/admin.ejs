@@ -1,0 +1,31 @@
+<% layout('layout') -%>
+<h3 class="mb-3">Admin Dashboard</h3>
+<div class="row g-3">
+<div class="col-md-4">
+<div class="card h-100">
+<div class="card-body">
+<h5>Leaderboard (Top 10)</h5>
+<ol class="mb-0">
+<% leaderboard.forEach(p=>{ %>
+<li><strong><%= p.name %></strong> – <%= p.score %> pts</li>
+<% }) %>
+</ol>
+</div>
+</div>
+</div>
+<div class="col-md-8">
+<div class="card mb-3">
+<div class="card-body">
+<h5>User Management</h5>
+<a class="btn btn-outline-success" href="/admin/users">Manage Users</a>
+</div>
+</div>
+<div class="d-flex gap-2 flex-wrap">
+<a class="btn btn-success" href="/lessons/create/new">New Lesson</a>
+<a class="btn btn-success" href="/quizzes/create/new">New Quiz</a>
+<a class="btn btn-success" href="/games/create/new">New Game</a>
+<a class="btn btn-outline-secondary" href="/tasks/verify">Verify Submissions</a>
+<a class="btn btn-outline-secondary" href="/badges/rules">Badge Rules</a>
+</div>
+</div>
+</div>

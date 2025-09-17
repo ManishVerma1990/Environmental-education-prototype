@@ -1,0 +1,28 @@
+<% if (msg && (msg.success || msg.error || msg.info || msg.warning)) { %>
+<div class="position-relative" style="z-index: 1">
+<% (msg.success||[]).forEach(t => { %>
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+<%= t %>
+<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+<% }) %>
+<% (msg.error||[]).forEach(t => { %>
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+<%= t %>
+<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+<% }) %>
+<% (msg.info||[]).forEach(t => { %>
+<div class="alert alert-info alert-dismissible fade show" role="alert">
+<%= t %>
+<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+<% }) %>
+<% (msg.warning||[]).forEach(t => { %>
+<div class="alert alert-warning alert-dismissible fade show" role="alert">
+<%= t %>
+<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+<% }) %>
+</div>
+<% } %>

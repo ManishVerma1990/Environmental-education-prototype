@@ -1,0 +1,18 @@
+<% layout('layout') -%>
+<div class="d-flex justify-content-between align-items-center mb-3">
+<h3>Quizzes</h3>
+<% if (user.role === 'teacher' || user.role === 'admin') { %>
+<a class="btn btn-success" href="/quizzes/create/new">Create Quiz</a>
+<% } %>
+</div>
+<div class="list-group">
+<% quizzes.forEach(q => { %>
+<a href="/quizzes/<%= q.id %>/take" class="list-group-item list-group-item-action">
+<div class="d-flex w-100 justify-content-between">
+<h5 class="mb-1"><%= q.title %></h5>
+<small><%= q.lesson_id?('Lesson #'+q.lesson_id):'Standalone' %></small>
+</div>
+<% if (q.is_checkpoint) { %><span class="badge bg-warning text-dark">Checkpoint</span><% } %>
+</a>
+<% }) %>
+</div>

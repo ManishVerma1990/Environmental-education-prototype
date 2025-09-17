@@ -1,0 +1,13 @@
+<% layout('layout') -%>
+<h3>Submit Proof – <%= task.title %></h3>
+<form action="/tasks/<%= task.id %>/submit" method="post" enctype="multipart/form-data">
+<div class="mb-3">
+<label class="form-label">Image (jpg/png)</label>
+<input type="file" name="image" accept="image/*" class="form-control" required />
+</div>
+<div class="mb-3">
+<label class="form-label">Description</label>
+<textarea name="description" class="form-control" rows="4" placeholder="Describe what you did"></textarea>
+</div>
+<button class="btn btn-success">Submit</button>
+</form>
