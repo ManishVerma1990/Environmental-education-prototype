@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html>
-<head>
-<%- include('partials/head') %>
-</head>
-<body class="bg-light">
-<%- include('partials/nav') %>
-<main class="container py-4">
-<%- include('partials/flash') %>
-<%- body %>
-</main>
-</body>
+  <head>
+    <%- include('partials/head') %>
+    <script src="https://cdn.botpress.cloud/webchat/v3.2/inject.js" defer></script>
+    <script src="https://files.bpcontent.cloud/2025/09/13/20/20250913200057-KGPU4X6B.js" defer></script>
+  </head>
+  <body class="bg-light">
+    <%- include('partials/nav') %>
+    <main class="container py-4"><%- include('partials/flash') %> <%- body %></main>
+  </body>
 </html>

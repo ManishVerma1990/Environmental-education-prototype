@@ -11,6 +11,7 @@
 </div>
 <% } else if (current.type === 'pdf') { %>
 <div class="ratio ratio-16x9 mb-3">
+    <!-- <video src="C:\Users\anshi\Videos\4K Video Downloader+\A Story Analysis of Death Stranding.mp4" height="100px" width="100px"></video> -->
 <iframe src="/pdfjs/web/viewer.html?file=<%= encodeURIComponent(pdfUrlFromCloudinary) %>"></iframe>
 </div>
 <% } else if (current.type === 'imageSet') { %>
