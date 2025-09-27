@@ -1,0 +1,87 @@
+<% layout('layout') -%>
+
+<div class="container py-4">
+  <h3>Generate Quiz from Lesson Text</h3>
+
+  <!-- Step 1: Input Lesson Text -->
+  <div class="mb-3">
+    <label class="form-label fw-semibold">Lesson Text</label>
+    <textarea id="lessonText" class="form-control" rows="6" placeholder="Paste lesson content here..."></textarea>
+  </div>
+
+  <button id="generateQuestionsBtn" class="btn btn-success mb-3">Make Questions</button>
+
+  <!-- Step 2: AI Generated Questions -->
+  <form id="quizForm" action="/quizzes/create" method="post">
+    <input type="hidden" name="lesson_id" value="<%=// lesson_id %>" />
+    <input type="hidden" name="title" value="<%=// title %>" />
+    <textarea name="questions" id="questionsJson" hidden></textarea>
+
+    <div id="questionsContainer"></div>
+
+    <button type="submit" class="btn btn-primary mt-3">Create Quiz</button>
+  </form>
+</div>
+
+<script>
+  document.getElementById("generateQuestionsBtn").addEventListener("click", async function () {
+    const lessonText = document.getElementById("lessonText").value.trim();
+    if (!lessonText) {
+      alert("Please enter lesson text.");
+      return;
+    }
+
+    // Clear previous questions
+    const container = document.getElementById("questionsContainer");
+    container.innerHTML = "";
+
+    // Call backend API to generate questions
+    const response = await fetch("/quizzes/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ lesson: lessonText }),
+    });
+    const data = await response.json();
+
+    if (!data.questions || data.questions.length === 0) {
+      container.innerHTML = '<p class="text-danger">No questions generated.</p>';
+      return;
+    }
+
+    // Render generated questions with checkboxes
+    data.questions.forEach((q, i) => {
+      const card = document.createElement("div");
+      card.className = "card mb-3 shadow-sm p-3";
+      card.innerHTML = `
+      <div class="form-check mb-2">
+        <input class="form-check-input approve-checkbox" type="checkbox" value="${i}" id="approve_${i}" checked>
+        <label class="form-check-label fw-semibold" for="approve_${i}">Approve Question #${i + 1}</label>
+      </div>
+      <p class="mb-1"><strong>Q:</strong> ${q.question}</p>
+      <ul class="mb-0 list-group">
+        ${q.options.map((opt, j) => `<li class="list-group-item">${String.fromCharCode(65 + j)}. ${opt}</li>`).join("")}
+      </ul>
+    `;
+      container.appendChild(card);
+    });
+  });
+
+  // On submit, collect only approved questions and save as JSON
+  document.getElementById("quizForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const approvedIndices = Array.from(document.querySelectorAll(".approve-checkbox:checked")).map((cb) => Number(cb.value));
+    const allCards = document.querySelectorAll("#questionsContainer .card");
+    const questions = [];
+
+    approvedIndices.forEach((idx) => {
+      const card = allCards[idx];
+      const qText = card.querySelector("p").textContent.replace(/^Q:\s*/, "");
+      const options = Array.from(card.querySelectorAll("ul li")).map((li) => li.textContent.replace(/^[A-Z]\.\s/, ""));
+      // Here, answer is default to first option (teacher can adjust later in edit form)
+      questions.push({ q: qText, options, answer: 0 });
+    });
+
+    document.getElementById("questionsJson").value = JSON.stringify(questions);
+    e.target.submit();
+  });
+</script>

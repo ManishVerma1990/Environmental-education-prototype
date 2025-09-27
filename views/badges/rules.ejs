@@ -1,70 +1,157 @@
 <% layout('layout') -%>
-<h3>Badge Rules</h3>
 
-<div class="row g-4">
-  <!-- Create Badge -->
-  <div class="col-md-5">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5>Create Badge</h5>
-        <form action="/badges/rules/create" method="post">
-          <div class="mb-2">
-            <label class="form-label">Name</label>
-            <input name="name" class="form-control" required />
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Description</label>
-            <textarea name="description" class="form-control" rows="2"></textarea>
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Icon URL</label>
-            <input name="icon_url" type="url" class="form-control" />
-          </div>
-          <div class="mb-2">
-            <label class="form-label">Criteria</label>
-            <!-- Keep example simple to avoid parser confusion -->
-            <input name="criteria" class="form-control" placeholder="e.g., quiz_avg>=80 AND tasks_verified>=5" />
-          </div>
-          <button class="btn btn-success">Create</button>
-        </form>
+<!-- Bootstrap CSS & Icons for this page only -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+
+<div class="container py-4">
+  <h3 class="mb-4 text-success">Badge Rules</h3>
+
+  <div class="row g-4">
+    <!-- Create Badge -->
+    <div class="col-md-5">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="mb-3 text-success"><i class="bi bi-award-fill me-2"></i>Create Badge</h5>
+          <form action="/badges/rules/create" method="post">
+            <div class="mb-2">
+              <label class="form-label">Name</label>
+              <input name="name" class="form-control" required />
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Description</label>
+              <textarea name="description" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Icon URL</label>
+              <input name="icon_url" type="url" class="form-control" placeholder="Optional image link" />
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Criteria</label>
+              <input name="criteria" class="form-control" placeholder="e.g., quiz_avg>=80 AND tasks_verified>=5" />
+            </div>
+            <button class="btn btn-success w-100 mt-2"><i class="bi bi-plus-circle me-1"></i>Create</button>
+          </form>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Existing Badges -->
-  <div class="col-md-7">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5>Existing Badges</h5>
+    <!-- Existing Badges -->
+    <div class="col-md-7">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="mb-3 text-success"><i class="bi bi-award me-2"></i>Existing Badges</h5>
 
-        <ul class="list-group mb-3">
-          <% if (badges && badges.length) { %>
-            <% for (var i = 0; i < badges.length; i++) { var b = badges[i]; %>
-              <li class="list-group-item d-flex align-items-center justify-content-between">
-                <div>
-                  <% if (b.icon_url) { %>
-                    <img src="<%= b.icon_url %>" style="width:28px;height:28px" class="me-2" />
-                  <% } %>
-                  <strong><%= b.name %></strong>
-                  <small class="text-muted ms-2"><%= b.criteria %></small>
+          <ul class="list-group mb-3">
+            <% if (badges && badges.length) { %> <% badges.forEach(b => { %>
+            <li class="list-group-item d-flex align-items-center justify-content-between shadow-sm rounded mb-2">
+              <div class="d-flex align-items-center">
+                <% if (b.icon_url) { %>
+                <img src="<%= b.icon_url %>" style="width: 32px; height: 32px; object-fit: cover" class="me-2 rounded-circle" />
+                <% } else { %>
+                <div
+                  class="bg-success text-white d-flex align-items-center justify-content-center rounded-circle me-2"
+                  style="width: 32px; height: 32px"
+                >
+                  🏅
                 </div>
-                <!-- (Optional) Teacher assign button; remove or wire as needed -->
-                <!--
-                <form action="/badges/assign/<%= user ? user.id : 1 %>/<%= b.id %>" method="post">
-                  <button class="btn btn-sm btn-outline-secondary" type="submit">Assign</button>
-                </form>
-                -->
-              </li>
-            <% } %>
-          <% } else { %>
+                <% } %>
+                <div>
+                  <strong><%= b.name %></strong>
+                  <small class="text-muted d-block"><%= b.criteria %></small>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-success assign-btn"
+                data-bs-toggle="modal"
+                data-bs-target="#assignModal"
+                data-badge-id="<%= b.id %>"
+              >
+                <i class="bi bi-check2-circle me-1"></i>Assign
+              </button>
+            </li>
+            <% }) %> <% } else { %>
             <li class="list-group-item">No badges yet.</li>
-          <% } %>
-        </ul>
+            <% } %>
+          </ul>
 
-        <div class="alert alert-info mb-0">
-          You can evaluate/assign via routes or add buttons here later.
+          <div class="alert alert-info mb-0">
+            <i class="bi bi-info-circle me-1"></i>Assign a badge to multiple students by entering their IDs.
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Assign Badge Modal -->
+<div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="assignForm" method="POST">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="assignModalLabel">Assign Badge</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" name="badge_id" id="modalBadgeId" />
+          <div id="studentFieldsContainer">
+            <div class="input-group mb-2">
+              <span class="input-group-text">Student ID</span>
+              <input type="number" name="student_ids[]" class="form-control" required />
+              <button type="button" class="btn btn-outline-danger remove-student-btn">×</button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-primary" id="addStudentBtn">+ Add Another Student</button>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Assign Badge</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Bootstrap JS for this page only -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // Pass badge id to modal
+  document.querySelectorAll(".assign-btn").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const badgeId = this.dataset.badgeId;
+      document.getElementById("modalBadgeId").value = badgeId;
+
+      const container = document.getElementById("studentFieldsContainer");
+      container.innerHTML = `
+        <div class="input-group mb-2">
+          <span class="input-group-text">Student ID</span>
+          <input type="number" name="student_ids[]" class="form-control" required>
+          <button type="button" class="btn btn-outline-danger remove-student-btn">×</button>
+        </div>
+      `;
+    });
+  });
+
+  // Add new student field
+  document.getElementById("addStudentBtn").addEventListener("click", function () {
+    const container = document.getElementById("studentFieldsContainer");
+    const newField = document.createElement("div");
+    newField.className = "input-group mb-2";
+    newField.innerHTML = `
+      <span class="input-group-text">Student ID</span>
+      <input type="number" name="student_ids[]" class="form-control" required>
+      <button type="button" class="btn btn-outline-danger remove-student-btn">×</button>
+    `;
+    container.appendChild(newField);
+  });
+
+  // Remove student field
+  document.getElementById("studentFieldsContainer").addEventListener("click", function (e) {
+    if (e.target.classList.contains("remove-student-btn")) {
+      e.target.closest(".input-group").remove();
+    }
+  });
+</script>

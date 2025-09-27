@@ -1,44 +1,100 @@
 <% layout('layout') -%>
 <% const r = currentIndex || 0; %>
-<h3 class="mb-2"><%= lesson.title %></h3>
-<p class="text-muted"><%= lesson.description %></p>
 
+<div class="container-fluid">
+  <div class="row">
+    
+    <!-- Sidebar: All Resources -->
+<div class="col-md-3 vh-100 overflow-auto border-end" style="position:sticky; top:0; background-color:#f8fff8; padding-top:1rem;">
+  <h5 class="mb-4 fw-bold text-success text-center">Resources</h5>
+  <ul class="list-group list-group-flush">
+    <% resources.forEach((res, i) => { %>
+      <li class="list-group-item d-flex align-items-center mb-2 rounded 
+                 <%= i===r ? 'bg-success text-white shadow-sm' : 'bg-white' %>" 
+          style="cursor:pointer; transition:0.2s;">
+        
+        <!-- Thumbnail -->
+        <% if(res.type==='video') { %>
+          <img src="/images/vecteezy_human-hand-and-seedling-nature-background-concept-planting_13395787.jpg" class="me-3 rounded" style="width:50px; height:50px; object-fit:cover; box-shadow:0 2px 4px rgba(0,0,0,0.1)"/>
+        <% } else if(res.type==='pdf') { %>
+          <img src="/images/vecteezy_human-hand-and-seedling-nature-background-concept-planting_13395787.jpg" class="me-3 rounded" style="width:50px; height:50px; object-fit:cover; box-shadow:0 2px 4px rgba(0,0,0,0.1)"/>
+        <% } else if(res.type==='imageSet') { %>
+          <img src="/images/vecteezy_human-hand-and-seedling-nature-background-concept-planting_13395787.jpg" class="me-3 rounded" style="width:50px; height:50px; object-fit:cover; box-shadow:0 2px 4px rgba(0,0,0,0.1)"/>
+        <% } else if(res.type==='quiz') { %>
+          <img src="/images/vecteezy_human-hand-and-seedling-nature-background-concept-planting_13395787.jpg" class="me-3 rounded" style="width:50px; height:50px; object-fit:cover; box-shadow:0 2px 4px rgba(0,0,0,0.1)"/>
+        <% } %>
 
-<% if (current) { %>
-<% if (current.type === 'video') { %>
-<div class="ratio ratio-16x9 mb-3">
-<iframe src="<%= current.url %>" allowfullscreen></iframe>
+        <!-- Resource title -->
+        <a href="?r=<%= i %>" class="stretched-link text-decoration-none fw-semibold 
+           <%= i===r ? 'text-white' : 'text-success' %>">
+          <%= res.title || res.type.charAt(0).toUpperCase() + res.type.slice(1) %>
+        </a>
+      </li>
+    <% }) %>
+  </ul>
 </div>
-<% } else if (current.type === 'pdf') { %>
-<div class="ratio ratio-16x9 mb-3">
-    <!-- <video src="C:\Users\anshi\Videos\4K Video Downloader+\A Story Analysis of Death Stranding.mp4" height="100px" width="100px"></video> -->
-<iframe src="/pdfjs/web/viewer.html?file=<%= encodeURIComponent(pdfUrlFromCloudinary) %>"></iframe>
-</div>
-<% } else if (current.type === 'imageSet') { %>
-<div id="imgSet" class="d-flex gap-2 flex-wrap mb-3">
-<% (current.images||[]).forEach(src => { %>
-<img src="<%= src %>" class="img-thumbnail" style="max-width:220px"/>
-<% }) %>
-</div>
-<% } %>
-<% } %>
 
 
-<div class="d-flex justify-content-between">
-<a class="btn btn-outline-secondary <%= r<=0?'disabled':'' %>" href="?r=<%= Math.max(0,r-1) %>">Prev</a>
-<a class="btn btn-outline-primary <%= r>=resources.length-1?'disabled':'' %>" href="?r=<%= Math.min(resources.length-1,r+1) %>">Next</a>
-</div>
+    <!-- Main Content -->
+    <div class="col-md-9">
+      <h3 class="mt-3"><%= lesson.title %></h3>
+      <p class="text-muted"><%= lesson.description %></p>
 
+      <% if(current) { %>
+        <% if(current.type==='video') { %>
+          <div class="ratio ratio-16x9 mb-3">
+            <iframe src="<%= current.url %>" allowfullscreen></iframe>
+          </div>
+        <% } else if(current.type==='pdf') { %>
+          <div class="ratio ratio-16x9 mb-3">
+            <iframe src="/pdf/3rsPdf.pdf"></iframe>
+          </div>
+        <% } else if(current.type==='imageSet') { %>
+          <div id="imgSet" class="d-flex gap-2 flex-wrap mb-3">
+            <% (current.images||[]).forEach(src => { %>
+              <img src="<%= src %>" class="img-thumbnail" style="max-width:220px"/>
+            <% }) %>
+          </div>
+        <% } else if(current.type==='quiz') { %>
+          <div class="mb-3">
+            <a href="/quizzes/<%= current.quizId %>/take" class="btn btn-primary">Take Quiz</a>
+          </div>
+        <% } %>
+      <% } %>
 
-<form class="mt-3" action="/lessons/<%= lesson.id %>/complete" method="post">
-<button class="btn btn-success" <%= r<resources.length-1?'disabled':'' %>>Mark Lesson Complete (+5)</button>
-</form>
+      <div class="d-flex justify-content-between mb-3">
+        <a class="btn btn-outline-secondary <%= r<=0?'disabled':'' %>" href="?r=<%= Math.max(0,r-1) %>">Prev</a>
+        <a class="btn btn-outline-primary <%= r>=resources.length-1?'disabled':'' %>" href="?r=<%= Math.min(resources.length-1,r+1) %>">Next</a>
+      </div>
 
+      <form class="mb-4" action="/lessons/<%= lesson.id %>/complete" method="post">
+        <button class="btn btn-success" <%= r<resources.length-1?'disabled':'' %>>Mark Lesson Complete (+5)</button>
+      </form>
 
-<hr/>
-<h5>Checkpoints</h5>
-<ul class="mb-0">
-<% (checkpoints||[]).forEach(cp=>{ %>
-<li>Quiz #<%= cp.quizId %> after resource <%= cp.afterResourceIndex %> — <a href="/quizzes/<%= cp.quizId %>/take">Take now</a></li>
-<% }) %>
+      <hr/>
+      <h5 class="mb-3 fw-bold text-success"><i class="bi bi-flag-fill me-2"></i>Checkpoints</h5>
+
+<ul class="list-group list-group-flush">
+  <li class="list-group-item d-flex justify-content-between align-items-center border-success rounded mb-2 shadow-sm">
+    <span>Quiz #1 after resource 1</span>
+    <a href="/quizzes/1/take" class="btn btn-sm btn-success">Take Now</a>
+  </li>
+  <li class="list-group-item d-flex justify-content-between align-items-center border-success rounded mb-2 shadow-sm">
+    <span>Quiz #2 after resource 2</span>
+    <a href="/quizzes/2/take" class="btn btn-sm btn-success">Take Now</a>
+  </li>
+  <li class="list-group-item d-flex justify-content-between align-items-center border-success rounded mb-2 shadow-sm">
+    <span>Quiz #3 after resource 3</span>
+    <a href="/quizzes/3/take" class="btn btn-sm btn-success">Take Now</a>
+  </li>
 </ul>
+
+    </div>
+  </div>
+</div>
+
+<% /* Helper function to extract YouTube thumbnail ID */ %>
+<% function extractYouTubeId(url){ 
+     const match = url.match(/[?&]v=([^&]+)/); 
+     return match ? match[1] : ''; 
+} %>

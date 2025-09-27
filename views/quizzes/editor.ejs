@@ -1,30 +1,144 @@
 <% layout('layout') -%>
-<h3>Create Quiz</h3>
-<form action="/quizzes/create" method="post">
-<div class="row g-3">
-<div class="col-md-6">
-<label class="form-label">Title</label>
-<input name="title" class="form-control" required />
-</div>
-<div class="col-md-3">
-<label class="form-label">Lesson ID (optional)</label>
-<input name="lesson_id" type="number" class="form-control" />
-</div>
-<div class="col-md-3">
-<label class="form-label">Is Checkpoint?</label>
-<select name="is_checkpoint" class="form-select">
-<option value="0" selected>No</option>
-<option value="1">Yes</option>
-</select>
-</div>
-<div class="col-md-3">
-<label class="form-label">Position (if embedded)</label>
-<input name="position" type="number" class="form-control" />
-</div>
-<div class="col-12">
-<label class="form-label">Questions JSON</label>
-<textarea name="questions" class="form-control" rows="8" placeholder='[{"q":"What is 2+2?","options":["2","4"],"answer":1}]'></textarea>
-</div>
-</div>
-<button class="btn btn-success mt-3">Save Quiz</button>
+
+<h3>
+  Create Quiz
+  <a href="/quizzes/aigenerator" class="btn btn-outline-success">Use AI generator</a>
+</h3>
+<form id="quizForm" action="/quizzes/create" method="post">
+  <div class="row g-3 mb-3">
+    <div class="col-md-6">
+      <label class="form-label">Title</label>
+      <input name="title" class="form-control" required />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Lesson ID (optional)</label>
+      <input name="lesson_id" type="number" class="form-control" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Is Checkpoint?</label>
+      <select name="is_checkpoint" class="form-select">
+        <option value="0" selected>No</option>
+        <option value="1">Yes</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Position (if embedded)</label>
+      <input name="position" type="number" class="form-control" />
+    </div>
+  </div>
+
+  <h5 class="mb-3">Questions</h5>
+  <div id="questionsContainer"></div>
+
+  <button type="button" class="btn btn-outline-success mb-3" id="addQuestionBtn">+ Add Question</button>
+
+  <!-- Hidden textarea to hold JSON -->
+  <textarea name="questions" id="questionsJson" hidden></textarea>
+  <br />
+  <button class="btn btn-success" type="submit">Save Quiz</button>
 </form>
+
+<script>
+  let questionCount = 0;
+
+  function createOptionInput(qIndex, oIndex) {
+    return `
+      <div class="input-group mb-1">
+        <span class="input-group-text">Option ${oIndex + 1}</span>
+        <input type="text" class="form-control option-input" data-question="${qIndex}" data-index="${oIndex}" placeholder="Option text" required>
+        <button type="button" class="btn btn-outline-danger remove-option-btn">×</button>
+      </div>
+    `;
+  }
+
+  function addQuestion() {
+    const qIndex = questionCount++;
+    const questionHtml = document.createElement("div");
+    questionHtml.classList.add("card", "mb-3", "p-3", "shadow-sm");
+    questionHtml.innerHTML = `
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6>Question #${qIndex + 1}</h6>
+        <button type="button" class="btn btn-sm btn-outline-danger remove-question-btn">Remove</button>
+      </div>
+      <input type="text" class="form-control mb-2 question-text" data-index="${qIndex}" placeholder="Enter question text" required>
+      <div class="options-container mb-2"></div>
+      <button type="button" class="btn btn-sm btn-outline-primary add-option-btn">+ Add Option</button>
+      <select class="form-select mt-2 correct-answer-select" data-index="${qIndex}" required>
+        <option value="" selected disabled>Select correct answer</option>
+      </select>
+    `;
+    document.getElementById("questionsContainer").appendChild(questionHtml);
+
+    // Add initial 2 options
+    const optionsContainer = questionHtml.querySelector(".options-container");
+    const correctSelect = questionHtml.querySelector(".correct-answer-select");
+    for (let i = 0; i < 2; i++) {
+      optionsContainer.insertAdjacentHTML("beforeend", createOptionInput(qIndex, i));
+      const opt = document.createElement("option");
+      opt.value = i;
+      opt.textContent = `Option ${i + 1}`;
+      correctSelect.appendChild(opt);
+    }
+  }
+
+  document.getElementById("addQuestionBtn").addEventListener("click", addQuestion);
+
+  // Delegate events for dynamic elements
+  document.getElementById("questionsContainer").addEventListener("click", function (e) {
+    // Remove question
+    if (e.target.classList.contains("remove-question-btn")) {
+      e.target.closest(".card").remove();
+    }
+
+    // Add new option
+    if (e.target.classList.contains("add-option-btn")) {
+      const card = e.target.closest(".card");
+      const qIndex = card.querySelector(".question-text").dataset.index;
+      const optionsContainer = card.querySelector(".options-container");
+      const correctSelect = card.querySelector(".correct-answer-select");
+      const oIndex = optionsContainer.children.length;
+      optionsContainer.insertAdjacentHTML("beforeend", createOptionInput(qIndex, oIndex));
+
+      const opt = document.createElement("option");
+      opt.value = oIndex;
+      opt.textContent = `Option ${oIndex + 1}`;
+      correctSelect.appendChild(opt);
+    }
+
+    // Remove option
+    if (e.target.classList.contains("remove-option-btn")) {
+      const card = e.target.closest(".card");
+      const optionsContainer = card.querySelector(".options-container");
+      const correctSelect = card.querySelector(".correct-answer-select");
+
+      const input = e.target.previousElementSibling;
+      const optionIndex = Array.from(optionsContainer.children).indexOf(e.target.parentElement);
+      e.target.parentElement.remove();
+
+      // Remove corresponding option from select
+      correctSelect.querySelector(`option[value='${optionIndex}']`)?.remove();
+
+      // Re-index remaining options
+      Array.from(optionsContainer.children).forEach((optDiv, idx) => {
+        optDiv.querySelector("span").textContent = `Option ${idx + 1}`;
+        correctSelect.querySelector(`option[value='${idx}']`).value = idx;
+        correctSelect.querySelector(`option[value='${idx}']`).textContent = `Option ${idx + 1}`;
+      });
+    }
+  });
+
+  // On form submit, build JSON
+  document.getElementById("quizForm").addEventListener("submit", function (e) {
+    const questions = [];
+    document.querySelectorAll(".card").forEach((card) => {
+      const qText = card.querySelector(".question-text").value.trim();
+      const options = Array.from(card.querySelectorAll(".option-input")).map((i) => i.value.trim());
+      const answer = parseInt(card.querySelector(".correct-answer-select").value);
+      questions.push({ q: qText, options, answer });
+    });
+    document.getElementById("questionsJson").value = JSON.stringify(questions);
+  });
+
+  // Initialize first question
+  addQuestion();
+</script>
