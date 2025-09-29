@@ -5,3 +5,16 @@
   transform: translateY(-2px);
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
 }
+.step-card {
+  margin-bottom: 0.75rem;
+}
+.img-preview {
+  width: 100px;
+  height: 70px;
+  object-fit: cover;
+  margin-right: 0.5rem;
+  border-radius: 0.25rem;
+}
+.remove-step-btn {
+  cursor: pointer;
+}

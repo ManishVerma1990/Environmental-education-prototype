@@ -1,6 +1,9 @@
 <% layout('layout') -%>
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h3>Real‑World Tasks</h3>
+  <h3>Tasks and challenges</h3>
+  <% if (user.role === 'teacher' || user.role === 'admin') { %>
+  <a class="btn btn-success" href="/tasks/create/new">Create Task</a>
+  <% } %>
 </div>
 <div class="row g-3">
   <% tasks.forEach(t=>{ %>

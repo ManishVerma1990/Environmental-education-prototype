@@ -48,9 +48,7 @@
           </div>
 
           <!-- Mark Task Complete Button -->
-          <form action="/tasks/<%= task.id %>/complete" method="post" class="mt-3">
-            <button class="btn btn-success w-100">Mark Task Complete (+<%= task.points %> pts)</button>
-          </form>
+          <a class="btn btn-outline-success btn-sm" href="/tasks/<%= task.id %>/submit">Submit Proof</a>
         </div>
       </div>
     </div>

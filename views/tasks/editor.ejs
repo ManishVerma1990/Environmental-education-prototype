@@ -1,0 +1,96 @@
+<% layout('layout') -%>
+<div class="container py-4">
+  <h3 class="mb-3">Create New Eco Task</h3>
+
+  <form id="taskForm" class="needs-validation" novalidate>
+    <div class="mb-3">
+      <label for="title" class="form-label">Task Title</label>
+      <input type="text" class="form-control" id="title" name="title" placeholder="eg. Community Tree Plantation" required />
+      <div class="invalid-feedback">Please enter a task title.</div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Steps to Complete</label>
+      <div id="stepsList">
+        <!-- Steps will be appended here -->
+      </div>
+      <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="addStepBtn">+ Add Step</button>
+    </div>
+
+    <div class="mb-3">
+      <label for="images" class="form-label">Sample Images (optional)</label>
+      <input class="form-control" type="file" id="images" name="images" accept="image/*" multiple />
+      <div class="mt-2" id="imagePreview" aria-live="polite"></div>
+    </div>
+
+    <div class="mb-3">
+      <label for="ecoPoints" class="form-label">Eco-Points Reward</label>
+      <input type="number" class="form-control" id="ecoPoints" name="ecoPoints" min="0" value="10" required />
+      <div class="invalid-feedback">Please set eco-points (0 or more).</div>
+    </div>
+
+    <div class="mb-3">
+      <label for="difficulty" class="form-label">Difficulty (optional)</label>
+      <select id="difficulty" name="difficulty" class="form-select">
+        <option value="easy">Easy</option>
+        <option value="medium" selected>Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+    </div>
+
+    <div class="d-flex gap-2">
+      <button class="btn btn-primary" type="submit">Create Task</button>
+      <button class="btn btn-outline-secondary" type="button" id="resetBtn">Reset</button>
+    </div>
+  </form>
+</div>
+<script>
+  // Utility: create a single step card
+  function createStep(index, text = "") {
+    const wrapper = document.createElement("div");
+    wrapper.className = "card step-card p-3";
+    wrapper.dataset.index = index;
+
+    wrapper.innerHTML = `
+<div class="d-flex justify-content-between align-items-start mb-2">
+<strong>Step ${index + 1}</strong>
+<button type="button" class="btn btn-sm btn-outline-danger remove-step-btn">Remove</button>
+</div>
+<div class="mb-2">
+<textarea class="form-control step-input" placeholder="Describe this step (what to do, materials needed, duration)..." required>${text}</textarea>
+<div class="invalid-feedback">Please describe this step.</div>
+</div>
+`;
+
+    // remove handler
+    wrapper.querySelector(".remove-step-btn").addEventListener("click", () => {
+      wrapper.remove();
+      refreshStepNumbers();
+    });
+
+    return wrapper;
+  }
+
+  const stepsList = document.getElementById("stepsList");
+  const addStepBtn = document.getElementById("addStepBtn");
+  const imagesInput = document.getElementById("images");
+  const imagePreview = document.getElementById("imagePreview");
+  const taskForm = document.getElementById("taskForm");
+  const output = document.getElementById("output");
+  const resetBtn = document.getElementById("resetBtn");
+
+  let stepCount = 0;
+
+  function refreshStepNumbers() {
+    const cards = stepsList.querySelectorAll(".step-card");
+    cards.forEach((card, idx) => {
+      card.dataset.index = idx;
+      card.querySelector("strong").textContent = "Step " + (idx + 1);
+    });
+    stepCount = cards.length;
+  }
+
+  // add initial step
+  stepsList.appendChild(createStep(stepCount));
+  stepCount++;
+</script>

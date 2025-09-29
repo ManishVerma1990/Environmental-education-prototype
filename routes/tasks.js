@@ -18,6 +18,10 @@ router.get("/:id", auth, (req, res) => {
   res.render("tasks/show", { task });
 });
 
+router.get("/create/new", auth, (req, res) => {
+  res.render("tasks/editor");
+});
+
 router.get("/:id/submit", auth, (req, res) => {
   const task = db.prepare("SELECT * FROM tasks WHERE id=?").get(req.params.id);
   res.render("tasks/submit", { task });
